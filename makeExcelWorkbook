@@ -1,0 +1,63 @@
+	
+  // headers를 받기(DB에서 받는다) - 수정필요
+  // 필요한 Data = getter와 매칭되는 변수명들의 모임, 언어에 따른 컬럼명이 담긴 데이터들의 모임
+  
+  // 아래의 데이터들을 DB에서 뽑거나 다듬을 필요 있음 - 일단 하드 코딩
+  // String[] a = {"email", "status", "agree_datetime", "reg_datetime", "denial_datetime"}; - getmethod와 일치하는 데이터 (임시 하드코딩)
+  // excelSubscribeMap.put("ko", new String[]{ "NO", "이메일", "상태", "약관동의", "등록일", "수신거부"}); - headers
+	// excelSubscribeMap.put("en", new String []{ "NO", "Email", "Status", "Agree_datetime", "Reg_datetime", "Denial_datetime"}); - headers
+  
+  
+  @Override
+	public <T> SXSSFWorkbook makeExcelWorkbook(List<T> list, String[] headers) {
+
+		SXSSFWorkbook workbook = new SXSSFWorkbook();
+
+		// 시트 생성
+		SXSSFSheet sheet = workbook.createSheet("Sheet1");
+
+		// 시트 열 너비 설정
+    // sheet.setColumnWidth(0, 3000);
+
+		// 헤더 행 생성
+		Row headerRow = sheet.createRow(0);
+
+		// 열 선언
+		Cell headerCell;
+
+		// 열에 헤더 삽입
+		for (int i = 0; i < headers.length; i++) {
+			headerCell = headerRow.createCell(i);
+			headerCell.setCellValue(headers[i]);
+		}
+    
+		String[] a = {"email", "status", "agree_datetime", "reg_datetime", "denial_datetime"}; // 위의 내용 - 하드코딩
+
+		// 헤더 밑에 행 및 셀 생성
+		Row bodyRow = null;
+		Cell bodyCell = null;
+		for (int i = 0; i < list.size(); i++) {
+			T dto = list.get(i);
+
+			int num = 0;
+			bodyRow = sheet.createRow(i + 1);
+			Method[] methodArr = dto.getClass().getDeclaredMethods();
+			
+			for (int k = 0; k < a.length; k++) {
+				for (Method method : methodArr) {
+					if (method.getName().startsWith("get")) {
+						Method curMethod = method;
+						try { // (String) curMethod.invoke(dto, null) -> 이부분 충분히 신경쓰기(안 먹어서 StringUtils.isBlank로 감싸고 String.valueof 사용해도 되긴 함)
+							if(((String) curMethod.invoke(dto, null)) != null && (curMethod.getName().replace("get", "").toLowerCase().equals(a[k]))) {
+						              bodyCell = bodyRow.createCell(num++);
+						              bodyCell.setCellValue((String) curMethod.invoke(dto, null));
+							}
+						} catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
+							e.printStackTrace();
+						}
+					}
+				}
+			}
+		}
+		return workbook;
+	}
