@@ -7,6 +7,19 @@
   // excelSubscribeMap.put("ko", new String[]{ "NO", "이메일", "상태", "약관동의", "등록일", "수신거부"}); - headers
 	// excelSubscribeMap.put("en", new String []{ "NO", "Email", "Status", "Agree_datetime", "Reg_datetime", "Denial_datetime"}); - headers
   
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.xssf.streaming.SXSSFSheet;
+import org.apache.poi.xssf.streaming.SXSSFWorkbook;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
   
   @Override
 	public <T> SXSSFWorkbook makeExcelWorkbook(List<T> list, String[] headers) {
